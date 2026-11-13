@@ -251,7 +251,7 @@ button:disabled { cursor: default; }
               linear-gradient(to right, transparent 81.7%, black 82.7%);
   mask-composite: add;
 }
-.track-section { background: linear-gradient(130deg,#ffeed0,#f1dfb1); }
+.track-section { background: #f8fafc; }
 .tracks-layout { display: grid; grid-template-columns: minmax(220px,.77fr) 1.5fr; border: 1px solid var(--line); border-radius: 13px; overflow: hidden; background: var(--ivory); box-shadow: 0 16px 45px #0b2c4310; }
 .track-tablist { display: flex; flex-direction: column; border-right: 1px solid var(--line); }
 .track-tablist button { display: flex; flex: 1; align-items: center; gap: 12px; min-height: 55px; padding: 11px 18px; text-align: left; font-size: 14px; font-weight: 800; border-bottom: 1px solid var(--line); transition: background .2s, padding-left .24s var(--ease); }
@@ -449,4 +449,79 @@ button:disabled { cursor: default; }
   .registration-details { justify-content: flex-start; }
   .registration-actions { flex-direction: column; }
   .scroll-cue { margin-top: 27px; }
+}
+
+.scroll-kite { position: absolute; z-index: 2; width: clamp(32px, 6vw, 68px); top: 25%; right: 13%; color: #ffc471; pointer-events: none; }
+.track-panel-content { position: relative; }
+.track-animation { position: absolute; top: 0; right: 0; width: clamp(40px, 9vw, 80px); color: #f7941d; pointer-events: none; }
+.track-animation path { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.track-motion path { stroke-dasharray: 1; animation: track-draw .8s ease-out both; }
+.track-tablist:has([aria-selected="true"]:hover) + .track-panel .track-motion path,
+.track-tablist:has([aria-selected="true"]:focus-visible) + .track-panel .track-motion path { animation-name: track-redraw; }
+@keyframes track-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes track-redraw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.track-car { fill: currentColor; offset-path: path("M5 44C6 25 13 18 24 25S42 22 43 8"); offset-distance: 100%; }
+.track-motion .track-car { animation: track-car-drive .8s ease-out both; }
+@keyframes track-car-drive { from { offset-distance: 0%; } to { offset-distance: 100%; } }
+.agenda-progress { height: 2px; margin-bottom: 12px; border-radius: 2px; background: #f7941d35; }
+.agenda-progress span { display: block; height: 100%; background: #f7941d; transform-origin: left; }
+.lightbox-photo { position: relative; isolation: isolate; overflow: hidden; height: min(56dvh, 530px); transform-origin: top left; touch-action: pan-y pinch-zoom; }
+.lightbox-photo img { position: absolute; inset: 0; }
+@media (max-width: 640px) { .scroll-kite { right: 9%; } }
+@media (prefers-reduced-motion: reduce) { .track-motion path, .track-motion .track-car { animation: none; } }
+
+.track-panel { isolation: isolate; }
+[data-motion="on"] .track-panel-content::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -18px -18px auto;
+  height: 110px;
+  pointer-events: none;
+  background: repeating-linear-gradient(90deg, #f7941d40 0 1px, transparent 1px 18px),
+    repeating-linear-gradient(0deg, #f7941d40 0 1px, transparent 1px 18px);
+  mask-image: radial-gradient(ellipse at 85% 25%, #000, transparent 68%);
+  animation: track-grid-scan .85s ease-out both;
+}
+@keyframes track-grid-scan {
+  from { clip-path: inset(0 0 0 100%); }
+  to { clip-path: inset(0); }
+}
+
+.cloud-backdrop { position: absolute; z-index: -1; inset: 0; overflow: hidden; pointer-events: none; }
+.cloud-backdrop::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 38%, #fff9ee 0, #ffffff52 29%, transparent 55%); }
+.cloud-layer { position: absolute; opacity: .79; }
+.cloud-layer svg { display: block; width: 100%; }
+.cloud-far { left: 30%; opacity: .32; }
+.cloud-west { left: -7%; }
+.cloud-east { right: -3%; }
+.cloud-low { right: -5%; opacity: .61; }
+.cloud-particles i { position: absolute; left: var(--particle-x); top: var(--particle-y); width: 4px; height: 4px; border-radius: 50%; background: #ff9900; opacity: .38; animation: cloud-particle 12s ease-in-out infinite alternate; animation-delay: var(--particle-delay, 0s); }
+.cloud-particles i:nth-child(1) { --particle-x: 9%; --particle-y: 34%; }
+.cloud-particles i:nth-child(2) { --particle-x: 17%; --particle-y: 58%; --particle-delay: -5s; }
+.cloud-particles i:nth-child(3) { --particle-x: 4%; --particle-y: 71%; --particle-delay: -3s; }
+.cloud-particles i:nth-child(4) { --particle-x: 84%; --particle-y: 24%; --particle-delay: -4s; }
+.cloud-particles i:nth-child(5) { --particle-x: 92%; --particle-y: 52%; --particle-delay: -7s; }
+.cloud-particles i:nth-child(6) { --particle-x: 89%; --particle-y: 75%; --particle-delay: -2s; }
+@keyframes cloud-particle { to { transform: translate3d(10px, -14px, 0); opacity: .17; } }
+
+.track-network { position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+.track-network::before { content: ''; position: absolute; inset: -15%; background: radial-gradient(ellipse at 15% 70%, #87ceeb40, transparent 48%), radial-gradient(ellipse at 85% 20%, #ff990015, transparent 42%); animation: network-drift 19s ease-in-out infinite alternate; }
+.track-network svg { width: 100%; height: 100%; position: absolute; inset: 0; }
+.track-network path { fill: none; stroke: #4384a6; stroke-width: 1; opacity: .20; }
+.track-network circle { fill: #559ab9; opacity: .35; animation: network-node 7s ease-in-out infinite alternate; }
+.track-network circle:nth-of-type(3n) { fill: #ff9900; }
+@keyframes network-drift { to { transform: translate3d(4%, -3%, 0); } }
+@keyframes network-node { to { opacity: .13; } }
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .track-tablist button { position: relative; transition: transform .4s var(--ease), box-shadow .4s, background-color .4s; }
+  .track-tablist button:not([aria-selected="true"]):hover { background: linear-gradient(105deg, #fff7e9, #f2faff); }
+  .track-tablist button:hover { z-index: 1; transform: perspective(700px) translate3d(0,-2px,0) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)); box-shadow: inset 0 0 0 1px #ff9900a0, 0 5px 15px #ff990025; }
+  .track-tablist button:hover > svg:first-child { animation: track-icon-float .65s var(--ease); }
+}
+@keyframes track-icon-float { 45% { transform: translate3d(0,-3px,0); } }
+@media (max-width: 600px) {
+  .cloud-west { width: 41% !important; left: -14%; }
+  .cloud-east { width: 36% !important; right: -12%; }
 }

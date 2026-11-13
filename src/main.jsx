@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { AnimatePresence, motion, useReducedMotion, MotionConfig, useScroll, useSpring, useTransform } from 'motion/react';
 import { ArrowLeft, ArrowRight, ArrowUp, ArrowUpRight, CalendarDays, ChevronDown, Cloud, Code2, Cpu, MapPin, Menu, Mic, Radio, Shield, Sparkles, Users, X } from 'lucide-react';
 import { photos, sessions, tracks } from './event-data';
+import { CloudBackdrop, resetTrackTilt, ScrollKite, tiltTrack, TrackAnimation, TrackNetwork } from './event-motion';
 import './styles.css';
 
 const navigation = [['the-day','The day'],['tracks','Tracks'],['lineup','Schedule'],['glimpses','Glimpses'],['venue','Venue']];
@@ -151,6 +152,8 @@ function Hero({enabled, saveDate}) {
     <section ref={section} className="hero" aria-labelledby="event-title">
       <div className="hero-gridlight" aria-hidden="true" />
       <div className="hero-sunlight" aria-hidden="true" />
+      <CloudBackdrop enabled={enabled}/>
+      <ScrollKite progress={scrollYProgress} enabled={enabled}/>
       <motion.div className="hero-sky" style={{y:enabled?skyY:0}} aria-hidden="true">
         <span className="sky-wisp sky-wisp-left" />
         <span className="sky-wisp sky-wisp-right" />
@@ -266,17 +269,18 @@ function Tracks({enabled}) {
     setKey(keys[next]);
     tabs.current[next]?.focus();
   }
-  return <section id="tracks" className="track-section"><ScrollAccent enabled={enabled}/>
+  return <section id="tracks" className="track-section"><TrackNetwork/>
     <div className="site-wrap content-section">
       <SectionHeading eyebrow="TECHNICAL TRACKS" title="Six ways to" accent="build what's next." description="Choose a track to preview its focus areas. Detailed sessions and speakers will be announced soon." enabled={enabled}/>
       <Reveal enabled={enabled} className="tracks-layout">
         <div className="track-tablist" role="tablist" aria-label="Explore technical tracks" aria-orientation="vertical">
-          {keys.map((id,i) => {const TabIcon=trackIcons[id]; return <button key={id} type="button" role="tab" id={'tab-'+id} aria-selected={key===id} aria-controls="track-panel" tabIndex={key===id?0:-1} ref={element=>{tabs.current[i]=element;}} onClick={()=>setKey(id)} onKeyDown={event=>onTabKey(event,i)}><TabIcon size={19}/><span>{tracks[id].title}</span><ArrowRight size={16}/></button>;})}
+          {keys.map((id,i) => {const TabIcon=trackIcons[id]; return <motion.button key={id} type="button" role="tab" initial={enabled ? {opacity:.65} : false} whileInView={{opacity:1}} viewport={{once:true}} transition={{duration:enabled?.35:0,delay:enabled?i*.045:0}} onPointerMove={tiltTrack} onPointerLeave={resetTrackTilt} id={'tab-'+id} aria-selected={key===id} aria-controls="track-panel" tabIndex={key===id?0:-1} ref={element=>{tabs.current[i]=element;}} onClick={()=>setKey(id)} onKeyDown={event=>onTabKey(event,i)}><TabIcon size={19}/><span>{tracks[id].title}</span><ArrowRight size={16}/></motion.button>;})}
         </div>
         <div id="track-panel" className="track-panel" role="tabpanel" aria-labelledby={'tab-'+key} tabIndex={0}>
           <AnimatePresence mode="wait" initial={false}>
             <motion.div className="track-panel-content" key={key} initial={enabled?{opacity:0,x:12}:false} animate={{opacity:1,x:0}} exit={enabled?{opacity:0,x:-10}:undefined} transition={{duration:enabled?.22:0,ease}}>
               <div className="track-emblem"><Icon size={42}/></div>
+              <TrackAnimation id={key} enabled={enabled}/>
               <p className="eyebrow">{track.eyebrow}</p><h3>{track.title}</h3><p className="track-description">{track.description}</p>
               <div className="topic-list flex flex-wrap gap-2" aria-label="Focus areas">{track.topics.map(topic=><span key={topic}>{topic}</span>)}</div>
             </motion.div>
@@ -289,6 +293,8 @@ function Tracks({enabled}) {
 
 function TimelineRow({ title, items, enabled }) {
   const rail = useRef(null);
+  const group = useRef(null);
+  const { scrollYProgress } = useScroll({ target: group, offset: ["start .9", "end .45"] });
   const label = title.toLowerCase();
   const [limits,setLimits] = useState({prev:false,next:false});
   useEffect(() => {
@@ -305,7 +311,8 @@ function TimelineRow({ title, items, enabled }) {
     const width=node.firstElementChild.getBoundingClientRect().width+16;
     node.scrollBy({left:direction*width,behavior:enabled?'smooth':'instant'});
   }
-  return <section className="timeline-group" aria-labelledby={label+'-title'}>
+  return <section ref={group} className="timeline-group" aria-labelledby={label+'-title'}>
+    <div className="agenda-progress" aria-hidden="true"><motion.span style={{ scaleX: enabled ? scrollYProgress : 1 }}/></div>
     <div className="timeline-heading flex items-center justify-between gap-3">
       <h3 id={label+'-title'}>{title}</h3>
       {(limits.prev||limits.next) && <div className="flex gap-2">
@@ -319,7 +326,7 @@ function TimelineRow({ title, items, enabled }) {
       {items.map((item,i)=><motion.li className={'timeline-card tone-'+i} key={item.title} initial={enabled?{opacity:0,y:22}:false}
         whileInView={{opacity:1,y:0}} viewport={{once:true,amount:.2}} transition={{duration:enabled?.55:0,delay:enabled?i*.06:0,ease}}>
         <div className="timeline-time">{item.start} <span>–</span> {item.end}</div>
-        <div className="timeline-copy"><h4>{item.title}</h4><p>{item.description}</p></div><span className="timeline-dot" aria-hidden="true"/>
+        <div className="timeline-copy"><h4>{item.title}</h4><p>{item.description}</p></div><motion.span className="timeline-dot" aria-hidden="true" initial={enabled ? { scale: .55, opacity: .4 } : false} whileInView={{ scale: 1, opacity: 1 }} viewport={{ once: true, amount: .8 }} transition={{ duration: enabled ? .38 : 0 }}/>
       </motion.li>)}
     </ol>
   </section>;
@@ -344,15 +351,33 @@ function Gallery({enabled}) {
   const [index,setIndex]=useState(null);
   const dialog=useRef(null);
   const touch=useRef(null);
+  const thumbnail=useRef(null);
+  const photoFrame=useRef(null);
+  const [direction,setDirection]=useState(1);
   const shown=filter==='all'?photos:photos.filter(photo=>photo.category===filter);
   const selected=index===null?null:shown[index];
   const filters=[['all','All moments'],['sessions','Sessions'],['hands-on','Hands-on'],['community','Community']];
   useEffect(()=>{
     const node=dialog.current;
-    if(index!==null&&!node.open) node.showModal();
+    if(index!==null&&!node.open) {
+      node.showModal();
+      if (enabled && thumbnail.current && photoFrame.current) {
+        const frame=photoFrame.current;
+        const to=frame.getBoundingClientRect();
+        const from=thumbnail.current;
+        frame.animate([
+          { transform: `translate(${from.left-to.left}px,${from.top-to.top}px) scale(${from.width/to.width},${from.height/to.height})`, opacity: .6 },
+          { transform: 'none', opacity: 1 }
+        ], { duration: 420, easing: 'cubic-bezier(.22,1,.36,1)' });
+      }
+    }
     if(index===null&&node.open) node.close();
-  },[index]);
-  function step(direction) { setIndex(value=>(value+direction+shown.length)%shown.length); }
+  },[index,enabled]);
+  function step(direction) {
+    if (shown.length < 2) return;
+    setDirection(direction);
+    setIndex(value=>(value+direction+shown.length)%shown.length);
+  }
   return <section id="glimpses" className="site-wrap content-section">
     <SectionHeading eyebrow="GLIMPSES FROM 2025" title="The community" accent="in motion." description="Scenes from AWS Student Community Day Ahmedabad 2025 at Silver Oak University." enabled={enabled}/>
     <div className="gallery-filters flex flex-wrap gap-2" role="group" aria-label="Filter past event photos">
@@ -360,7 +385,7 @@ function Gallery({enabled}) {
     </div>
     <motion.div className="gallery-grid grid gap-4 sm:grid-cols-2 lg:grid-cols-3" key={filter}>
       {shown.map((photo,i)=><Reveal key={photo.src} enabled={enabled} delay={i%3*.065}>
-        <button type="button" className="gallery-card" onClick={()=>setIndex(i)} aria-label={'View '+photo.title}>
+        <button type="button" className="gallery-card" onClick={event=>{thumbnail.current=event.currentTarget.querySelector("img").getBoundingClientRect();setIndex(i);}} aria-label={'View '+photo.title}>
           <span className="gallery-image"><img src={photo.src} alt={photo.alt} loading="lazy" /><span className="gallery-open"><ArrowUpRight size={20}/></span></span>
           <span className="gallery-copy"><strong>{photo.title}</strong><span>{photo.label}</span></span>
         </button>
@@ -372,8 +397,13 @@ function Gallery({enabled}) {
     }}>
       {selected && <div className="lightbox-shell">
         <div className="lightbox-top flex justify-between items-center"><span>{index+1} / {shown.length}</span><button type="button" className="scene-button" aria-label="Close photo viewer" onClick={()=>setIndex(null)}><X size={21}/></button></div>
-        <div onTouchStart={e=>{touch.current=e.touches[0].clientX;}} onTouchEnd={e=>{if(touch.current!==null){const delta=e.changedTouches[0].clientX-touch.current;if(Math.abs(delta)>45) step(delta<0?1:-1);touch.current=null;}}}>
-          <img src={selected.src} alt={selected.alt}/>
+        <div ref={photoFrame} className="lightbox-photo" onTouchCancel={()=>{touch.current=null;}} onTouchStart={e=>{touch.current=e.touches[0].clientX;}} onTouchEnd={e=>{if(touch.current!==null){const delta=e.changedTouches[0].clientX-touch.current;if(Math.abs(delta)>45) step(delta<0?1:-1);touch.current=null;}}}>
+          <AnimatePresence initial={false} custom={direction}>
+            <motion.img key={selected.src} src={selected.src} alt={selected.alt}
+              variants={{ enter: side=>({x:side*44,opacity:0}), visible:{x:0,opacity:1}, exit:side=>({x:-side*44,opacity:0}) }}
+              initial={enabled ? 'enter' : false} animate="visible" exit={enabled ? 'exit' : undefined}
+              custom={direction} transition={{duration:enabled ? .25 : 0}}/>
+          </AnimatePresence>
         </div>
         <div className="lightbox-bottom flex justify-between items-center gap-4"><div><strong>{selected.title}</strong><p>{selected.caption}</p></div><div className="flex gap-2">
           <button type="button" className="scene-button" aria-label="Previous photo" disabled={shown.length<2} onClick={()=>step(-1)}><ArrowLeft size={16}/></button>
