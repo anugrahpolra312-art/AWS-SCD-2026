@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { AnimatePresence, motion, useReducedMotion, MotionConfig, useScroll, useSpring, useTransform } from 'motion/react';
 import { ArrowLeft, ArrowRight, ArrowUp, ArrowUpRight, CalendarDays, ChevronDown, Cloud, Code2, Cpu, MapPin, Menu, Mic, Radio, Shield, Sparkles, Users, X } from 'lucide-react';
@@ -83,47 +83,113 @@ function Header({ enabled }) {
   </header>;
 }
 
-function Intro({ enabled }) {
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    if (!enabled || location.hash || scrollY > 40) return;
+const titleArtwork = asset('event-title-2026.png');
+const titleWidth = 803;
+const titleHeight = 302;
+const tileHeight = titleHeight / 2;
+const tileWidth = tileHeight * 2 / 3;
+const tileOrder = [
+  [4, 0], [3, 0], [5, 0], [2, 0], [6, 0], [1, 0], [7, 0], [0, 0],
+  [1, 1], [0, 1], [2, 1], [6, 1], [7, 1], [5, 1], [3, 1], [4, 1],
+];
+
+function EventTitle({ enabled }) {
+  const [assembling, setAssembling] = useState(false);
+  useLayoutEffect(() => {
+    if (!enabled || (location.hash && location.hash !== '#top') || window.scrollY > 40) return;
     try {
-      if (sessionStorage.getItem('scd-react-intro')) return;
-      sessionStorage.setItem('scd-react-intro','1');
-    } catch {}
-    setVisible(true);
-    const timer = setTimeout(() => setVisible(false), 620);
-    const dismiss = () => setVisible(false);
-    const events = ['pointerdown','keydown','wheel','focusin'];
-    events.forEach(event => window.addEventListener(event,dismiss,{passive:true}));
-    return () => {
-      clearTimeout(timer);
-      events.forEach(event => window.removeEventListener(event,dismiss));
-    };
+      if (sessionStorage.getItem('scd-title-assembly')) return;
+      sessionStorage.setItem('scd-title-assembly', '1');
+    } catch { /* Play normally when storage is unavailable. */ }
+    setAssembling(true);
+    const timer = setTimeout(() => setAssembling(false), 1200);
+    return () => clearTimeout(timer);
   }, [enabled]);
-  return <AnimatePresence>
-    {visible && enabled && <motion.div className="intro" aria-hidden="true" exit={{ opacity:0, clipPath:'inset(0 0 100% 0)' }} transition={{duration:.35,ease}}>
-      <motion.div initial={{opacity:0,y:14}} animate={{opacity:1,y:0}} transition={{duration:.35,ease}}>
-        <span className="intro-kite"/><p>AWS STUDENT COMMUNITY DAY</p><small>AHMEDABAD 2026</small>
-      </motion.div>
-    </motion.div>}
-  </AnimatePresence>;
+
+  return <h1 id="event-title" className={enabled && assembling ? 'title-assembling' : undefined}>
+    <img className="title-original" src={titleArtwork} width={titleWidth} height={titleHeight}
+      fetchPriority="high" alt="AWS Student Community Day Ahmedabad 2026" />
+    {enabled && assembling && <span className="title-tiles" aria-hidden="true">
+      {tileOrder.map(([column, row], index) => {
+        const x = column * tileWidth;
+        const y = row * tileHeight;
+        const width = Math.min(tileWidth, titleWidth - x);
+        const height = tileHeight;
+        const bridge = row === 1 && column < 3;
+        const right = column >= 6;
+        return <span className="title-tile" key={index} style={{
+          left: `${100 * x / titleWidth}%`,
+          top: `${100 * y / titleHeight}%`,
+          width: `${100 * width / titleWidth}%`,
+          height: `${100 * height / titleHeight}%`,
+          '--tile-delay': `${index * 50}ms`,
+          '--tile-x': bridge ? '-22px' : right ? '23px' : '0px',
+          '--tile-y': bridge ? '18px' : row === 0 ? '-21px' : '13px',
+          '--tile-angle': bridge ? '-5deg' : right ? '5deg' : '-3deg',
+        }}>
+          <img src={titleArtwork} alt="" style={{
+            width: `${100 * titleWidth / width}%`,
+            left: `${-100 * x / width}%`,
+            top: `${-100 * y / height}%`,
+          }} />
+        </span>;
+      })}
+    </span>}
+  </h1>;
+}
+
+function FlipDigit({ digit, enabled }) {
+  const [current, setCurrent] = useState(digit);
+  const [previous, setPrevious] = useState(digit);
+  if (current !== digit) {
+    setPrevious(current);
+    setCurrent(digit);
+  }
+
+  const flipping = enabled && previous !== digit;
+  return <span className="flip-digit" aria-hidden="true">
+    <span className="flip-half flip-top"><span>{digit}</span></span>
+    <span className="flip-half flip-bottom"><span>{flipping ? previous : digit}</span></span>
+    {flipping && <React.Fragment key={digit}>
+      <span className="flip-half flip-top flip-out"><span>{previous}</span></span>
+      <span className="flip-half flip-bottom flip-in"><span>{digit}</span></span>
+    </React.Fragment>}
+  </span>;
+}
+
+function secondsToEvent() {
+  return Math.max(0, Math.ceil((eventStart - Date.now()) / 1000));
 }
 
 function Countdown({ enabled }) {
-  const [remaining, setRemaining] = useState(() => Math.max(0, Math.floor((eventStart - Date.now()) / 1000)));
+  const [remaining, setRemaining] = useState(secondsToEvent);
   useEffect(() => {
-    const timer = setInterval(() => setRemaining(Math.max(0, Math.floor((eventStart - Date.now()) / 1000))), 1000);
-    return () => clearInterval(timer);
+    let timer;
+    const tick = () => {
+      const seconds = secondsToEvent();
+      setRemaining(seconds);
+      if (seconds > 0) {
+        const untilNextSecond = (eventStart - Date.now()) % 1000 || 1000;
+        timer = setTimeout(tick, Math.max(0, untilNextSecond));
+      }
+    };
+    tick();
+    return () => clearTimeout(timer);
   }, []);
   const values = [['Days',Math.floor(remaining/86400)],['Hours',Math.floor(remaining/3600)%24],['Minutes',Math.floor(remaining/60)%60],['Seconds',remaining%60]];
   return <section className="countdown" aria-label="Countdown to AWS Student Community Day">
     <div className="site-wrap countdown-inner">
       <div className="countdown-label flex items-center gap-3"><Sparkles aria-hidden="true"/><div><strong>Countdown to Community Day</strong><span>12 December · 08:00 AM IST</span></div></div>
       <div className="countdown-values" role="timer" aria-live="off">
-        {values.map(([label,value]) => <div className="countdown-cell" key={label}>
-          <motion.strong key={value} initial={enabled?{opacity:.35,y:5}:false} animate={{opacity:1,y:0}} transition={{duration:enabled?.26:0}}>{String(value).padStart(2,'0')}</motion.strong><span>{label}</span>
-        </div>)}
+        {values.map(([label, value]) => {
+          const digits = String(value).padStart(2, '0');
+          return <div className="countdown-cell" key={label}>
+            <strong className="flip-value"><span className="sr-only">{digits}</span>
+              {[...digits].map((digit, index) => <FlipDigit key={index - digits.length} digit={digit} enabled={enabled}/>)}
+            </strong>
+            <span className="countdown-unit">{label}</span>
+          </div>;
+        })}
       </div>
       <a href="#venue" className="countdown-venue">Meet us at Silver Oak <ArrowUpRight size={17}/></a>
     </div>
@@ -165,9 +231,7 @@ function Hero({enabled, saveDate}) {
       <div className="site-wrap hero-layout">
         <motion.div className="hero-copy" style={{y:enabled?copyY:0}}>
           <Reveal enabled={enabled} hero delay={.07}><p className="eyebrow event-date"><span/> AWS STUDENT COMMUNITY DAY · 2026</p></Reveal>
-          <Reveal enabled={enabled} hero delay={.14}>
-            <h1 id="event-title"><img src={asset('event-title.png')} width="1774" height="724" fetchPriority="high" alt="AWS Student Community Day Ahmedabad 2026" /></h1>
-          </Reveal>
+          <EventTitle enabled={enabled}/>
           <Reveal enabled={enabled} hero delay={.23}>
             <div className="hero-venue flex items-start gap-3"><MapPin size={19}/><div><strong>Aryabhata Auditorium · Silver Oak University</strong><span>5th floor, EB-Block · Ahmedabad</span></div></div>
             <p className="hero-description">A day to explore cloud technology, meet fellow student builders, and share what you’re creating.</p>
@@ -184,19 +248,10 @@ function Hero({enabled, saveDate}) {
         <a className="scroll-cue" href="#the-day">Scroll to discover <ChevronDown size={16}/></a>
       </div>
     </section>
-    <Riverfront/>
     <Countdown enabled={enabled}/>
   </>;
 }
 
-function Riverfront() {
-  return <div className="riverfront">
-    <div className="riverfront-art">
-      <img className="riverfront-image" src={asset('main-poster.png')} width="1600" height="1600"
-        alt="Illustrated Ahmedabad skyline and Sabarmati Riverfront, with the full bridge, tower, and waterfront" loading="lazy" decoding="async" />
-    </div>
-  </div>;
-}
 
 function ScrollAccent({enabled, dark=false}) {
   const ref=useRef(null);
@@ -219,7 +274,7 @@ function Registration({enabled,saveDate}) {
     <div className="site-wrap registration-layout">
       <a href="/#top" className="registration-back"><ArrowLeft size={17}/> Back to the event</a>
       <Reveal enabled={enabled} hero className="registration-card">
-        <img className="registration-title" src={asset('event-title.png')} width="1774" height="724" alt="AWS Student Community Day Ahmedabad 2026"/>
+        <img className="registration-title" src={titleArtwork} width={titleWidth} height={titleHeight} alt="AWS Student Community Day Ahmedabad 2026"/>
         <p className="eyebrow registration-status"><span/> REGISTRATION UPDATE</p>
         <h1>Registrations<br/><em>opening soon.</em></h1>
         <p className="registration-description">Your next big idea starts here. Join student builders for a day of cloud, creativity, and community in Ahmedabad.</p>
@@ -469,7 +524,7 @@ function App() {
   },[]);
   return <MotionConfig reducedMotion={enabled?'never':'always'}>
     <div id="top"><a className="skip-link" href="#main">Skip to content</a>
-      <Intro enabled={enabled}/><Header enabled={enabled}/>
+      <Header enabled={enabled}/>
       <main id="main">
         {registrationPage ? <Registration enabled={enabled} saveDate={saveDate}/> : <>
         <Hero enabled={enabled} saveDate={saveDate}/>
