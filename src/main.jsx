@@ -9,10 +9,10 @@ import './styles.css';
 const navigation = [['the-day','The day'],['tracks','Tracks'],['lineup','Schedule'],['glimpses','Glimpses'],['venue','Venue']];
 const asset = name => '/assets/' + name;
 const mapUrl = 'https://www.google.com/maps/search/?api=1&query=Silver+Oak+University+Ahmedabad+Gujarat';
+const registrationUrl = 'https://konfhub.com/aws-student-community-day-ahmedabad-2026';
 const eventStart = Date.parse('2026-12-12T08:00:00+05:30');
 const ease = [.22,1,.36,1];
 const heroFrom = { y:0 }, heroTo = { y:80 };
-const registrationPage = /^\/registration(?:\.html)?\/?$/.test(location.pathname);
 const trackIcons = { behind: Cloud, devsecops: Shield, quantum: Cpu, agents: Sparkles, robotics: Code2, twinmaker: Radio };
 
 function Reveal({ children, className = '', enabled, delay = 0, hero = false }) {
@@ -69,14 +69,14 @@ function Header({ enabled }) {
       <nav className="desktop-navigation" aria-label="Main navigation">
         {navigation.map(([id,label]) => <a key={id} href={'/#'+id} aria-current={active === id ? 'location' : undefined}>{label}</a>)}
       </nav>
-      <a className="cta small desktop-save" href="/registration.html">Register <ArrowUpRight size={16}/></a>
+      <a className="cta small desktop-save" href={registrationUrl} target="_blank" rel="noreferrer">Register <ArrowUpRight size={16}/></a>
       <button type="button" ref={button} className="menu-button scene-button" aria-label={menu ? 'Close navigation' : 'Open navigation'} aria-expanded={menu} aria-controls="mobile-navigation" onClick={() => setMenu(!menu)}>{menu ? <X /> : <Menu />}</button>
     </div>
     <AnimatePresence initial={false}>
       {menu && <motion.nav id="mobile-navigation" className="mobile-navigation" aria-label="Mobile navigation"
         initial={enabled ? {opacity:0,y:-12} : false} animate={{opacity:1,y:0}} exit={{opacity:0,y:-8}} transition={{duration:enabled?.2:0}}>
         {navigation.map(([id,label]) => <a key={id} href={'/#'+id} onClick={() => setMenu(false)} aria-current={active === id ? 'location' : undefined}>{label}<ArrowRight size={17}/></a>)}
-        <a className="cta registration-link" href="/registration.html" onClick={() => setMenu(false)}>Register <ArrowUpRight size={17}/></a>
+        <a className="cta registration-link" href={registrationUrl} target="_blank" rel="noreferrer" onClick={() => setMenu(false)}>Register <ArrowUpRight size={17}/></a>
       </motion.nav>}
     </AnimatePresence>
     <motion.div className="reading-progress" style={{ scaleX: enabled ? progress : scrollYProgress }} aria-hidden="true" />
@@ -268,27 +268,6 @@ function ScrollAccent({enabled, dark=false}) {
   </div>;
 }
 
-function Registration({enabled,saveDate}) {
-  return <section className="registration-page">
-    <ScrollAccent enabled={enabled}/>
-    <div className="site-wrap registration-layout">
-      <a href="/#top" className="registration-back"><ArrowLeft size={17}/> Back to the event</a>
-      <Reveal enabled={enabled} hero className="registration-card">
-        <img className="registration-title" src={titleArtwork} width={titleWidth} height={titleHeight} alt="AWS Student Community Day Ahmedabad 2026"/>
-        <p className="eyebrow registration-status"><span/> REGISTRATION UPDATE</p>
-        <h1>Registrations<br/><em>opening soon.</em></h1>
-        <p className="registration-description">Your next big idea starts here. Join student builders for a day of cloud, creativity, and community in Ahmedabad.</p>
-        <p className="registration-notice">We’re getting everything ready. The registration link will be available here once registrations open. Check back soon!</p>
-        <div className="registration-details">
-          <div><CalendarDays size={20}/><p><strong>12 December 2026</strong><span>08:00 AM–05:30 PM IST</span></p></div>
-          <div><MapPin size={20}/><p><strong>Aryabhata Auditorium</strong><span>5th floor, EB-Block · Silver Oak University</span></p></div>
-        </div>
-        <div className="registration-actions"><button type="button" className="cta" onClick={saveDate}><CalendarDays size={17}/> Save the date</button><a className="cta secondary" href="/#lineup">Explore the schedule <ArrowRight size={17}/></a></div>
-      </Reveal>
-    </div>
-  </section>;
-}
-
 function Experience({enabled}) {
   const features = [
     [Cloud,'Explore the cloud','Hear new perspectives on AWS, cloud architecture, and emerging technology.'],
@@ -473,7 +452,7 @@ function Venue({enabled,saveDate}) {
   const questions=[
     ['When and where is the event?','Saturday, 12 December 2026, from 08:00 AM to 05:30 PM IST at Aryabhata Auditorium, 5th floor, EB-Block, Silver Oak University, Ahmedabad.'],
     ['Is the schedule available?','Yes. The schedule section has all ten activities and their timings.'],
-    ['How can I register?','Registrations will open soon. Select Register in the navigation to visit the registration page. You can save the event to your calendar in the meantime.'],
+    ['How can I register?','Registrations are open on KonfHub. Select Register in the navigation to open the registration page.'],
     ['What topics will be covered?','Explore Behind AWS Scenes, DevSecOps, Quantum, AI Agents, Robotics, and IoT TwinMaker in the technical tracks section.']
   ];
   return <>
@@ -526,14 +505,12 @@ function App() {
     <div id="top"><a className="skip-link" href="#main">Skip to content</a>
       <Header enabled={enabled}/>
       <main id="main">
-        {registrationPage ? <Registration enabled={enabled} saveDate={saveDate}/> : <>
         <Hero enabled={enabled} saveDate={saveDate}/>
         <Experience enabled={enabled}/>
         <Tracks enabled={enabled}/>
         <Schedule enabled={enabled}/>
         <Gallery enabled={enabled}/>
         <Venue enabled={enabled} saveDate={saveDate}/>
-        </>}
       </main>
       <footer className="site-footer"><div className="site-wrap footer-inner flex flex-wrap items-center justify-between gap-6"><div><strong>AWS Student Community Day Ahmedabad 2026</strong><span>AWS Student Builder Group at Silver Oak University</span></div><a href="#top" className="back-top">Back to top <ArrowUp size={17}/></a></div></footer>
       <div className="toast-holder" role="status" aria-live="polite"><AnimatePresence>{toast&&<motion.div className="toast" initial={enabled?{opacity:0,y:10}:false} animate={{opacity:1,y:0}} exit={{opacity:0}} transition={{duration:enabled?.2:0}}>Calendar file downloaded</motion.div>}</AnimatePresence></div>

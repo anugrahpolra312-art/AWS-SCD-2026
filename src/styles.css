@@ -462,37 +462,13 @@ button:disabled { cursor: default; }
 .heading-rule { display: block; width: 72px; height: 3px; margin-top: 21px; background: var(--orange); transform-origin: left; border-radius: 3px; }
 .scroll-cue { display: flex; width: fit-content; margin: 35px auto 0; align-items: center; gap: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .15em; color: var(--muted); }
 .scroll-cue:hover { color: var(--ink); }
-.track-section, .registration-page { position: relative; isolation: isolate; overflow: clip; }
+.track-section { position: relative; isolation: isolate; overflow: clip; }
 .scroll-atmosphere { position: absolute; inset: 0; overflow: hidden; z-index: -1; pointer-events: none; }
 .scroll-atmosphere svg { position: absolute; top: 2%; right: -100px; width: clamp(260px,42vw,620px); fill: none; stroke: #b96722; stroke-width: 1; opacity: .19; }
 .scroll-atmosphere .orbit-node { fill: var(--orange); stroke: none; }
 .scroll-atmosphere.on-dark svg { stroke: #e4bc77; opacity: .2; top: 10%; }
 .mobile-navigation > a.registration-link { min-height: 51px; padding: 12px 20px; border: 1px solid var(--ink); justify-content: center; }
-.registration-page { min-height: calc(100svh - var(--header)); background: radial-gradient(ellipse at 8% 30%,#ffdb974f,transparent 55%),var(--paper); }
-.registration-layout { padding-block: 30px 75px; }
-.registration-back { display: inline-flex; gap: 8px; align-items: center; font-weight: 800; font-size: 12px; padding-block: 12px; }
-.registration-back:hover { text-decoration: underline; text-underline-offset: 4px; }
-.registration-card { width: min(100%,800px); margin: 20px auto 0; padding: clamp(24px,5vw,60px); background: #fff8e7eb; border: 1px solid var(--line); border-top: 4px solid var(--orange); border-radius: 18px; box-shadow: 0 24px 70px #0b2c4310; text-align: center; }
-.registration-title { width: min(100%,330px); margin: 0 auto 30px; height: auto; mix-blend-mode: multiply; }
-.registration-status { display: flex; align-items: center; justify-content: center; gap: 9px; color: #86501e; }
-.registration-status span { width: 7px; height: 7px; border-radius: 50%; background: var(--orange); }
-.registration-card h1 { font-size: clamp(40px,6vw,76px); line-height: 1.04; font-weight: 800; letter-spacing: -.065em; margin-block: 16px 22px; }
-.registration-card h1 em { font-family: Georgia,serif; font-weight: 400; color: #99531b; }
-.registration-description { font-size: 15px; line-height: 1.75; max-width: 510px; margin-inline: auto; color: var(--muted); }
-.registration-notice { margin: 24px auto; max-width: 540px; padding: 17px; font-size: 13px; line-height: 1.7; background: #f7941d12; border: 1px solid #f7941d55; border-radius: 9px; }
-.registration-details { display: flex; flex-wrap: wrap; gap: 22px; justify-content: center; text-align: left; padding-block: 10px 24px; }
-.registration-details > div { display: flex; gap: 10px; align-items: flex-start; }
-.registration-details svg { color: #99531b; flex-shrink: 0; margin-top: 2px; }
-.registration-details strong { display: block; font-size: 13px; }
-.registration-details span { display: block; color: var(--muted); font-size: 11px; margin-top: 4px; }
-.registration-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
 @media (max-width:650px) {
-  .registration-layout { padding-block: 14px 40px; }
-  .registration-card { margin-top: 10px; padding-inline: 20px; }
-  .registration-title { width: min(100%,270px); }
-  .registration-description { font-size: 14px; }
-  .registration-details { justify-content: flex-start; }
-  .registration-actions { flex-direction: column; }
   .scroll-cue { margin-top: 27px; }
 }
 
