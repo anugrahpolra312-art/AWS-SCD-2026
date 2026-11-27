@@ -107,10 +107,6 @@ button:disabled { cursor: default; }
 .hero-venue span { display: block; color: var(--muted); font-size: 13px; }
 .hero-description { max-width: 460px; margin: 16px auto 0; font-size: 15px; line-height: 1.7; color: #314c5c; }
 .hero-actions { justify-content: center; margin-top: 22px; }
-.hero-date { display: flex; align-items: center; justify-content: center; gap: 12px; text-align: left; margin-top: 21px; font-size: 13px; }
-.hero-date div > span { display: block; color: var(--muted); font-size: 11px; margin-top: 3px; }
-.hero-date-tile { display: grid; place-items: center; width: 44px; height: 49px; padding: 3px; background: var(--ivory); border: 1px solid var(--ink); font-weight: 800; font-size: 20px; line-height: 1; }
-.hero-date-tile small { font-size: 9px; letter-spacing: .1em; }
 /* The warm wash stays behind the artwork and the kites fly along its edges. */
 .hero-sunlight {
   position: absolute;
@@ -217,7 +213,7 @@ button:disabled { cursor: default; }
   55% { transform: translate(12px, -4px) rotate(-8deg); }
   to { transform: translate(32px, -9px) rotate(0); opacity: .66; }
 }
-.countdown { background: var(--ink); color: var(--paper); }
+.countdown { position: relative; background: var(--ink); color: var(--paper); }
 .countdown-inner { display: grid; grid-template-columns: 1fr auto 1fr; gap: 30px; align-items: center; padding-block: 19px; }
 .countdown-label > svg { color: var(--orange); flex: 0 0 auto; }
 .countdown-label strong { display: block; font-size: 13px; }
@@ -284,8 +280,27 @@ button:disabled { cursor: default; }
   .flip-out { display: none; }
   .flip-in { animation: none; }
 }
-.countdown-venue { justify-self: end; display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 12px; }
+.countdown-actions { justify-self: end; display: flex; align-items: center; gap: 20px; }
+.countdown-venue { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 12px; }
 .countdown-venue svg { color: var(--orange); }
+.countdown-fullscreen { display: inline-flex; align-items: center; gap: 7px; min-height: 38px; padding: 8px 11px; border: 1px solid #fff1cf55; border-radius: 7px; color: var(--paper); font-size: 11px; font-weight: 800; transition: background .2s, border-color .2s, color .2s; }
+.countdown-fullscreen svg { color: var(--orange); }
+.countdown-fullscreen:hover { background: #fff1cf16; border-color: var(--orange); }
+.countdown-error:empty { display: none; }
+.countdown-error:not(:empty) { position: absolute; inset: auto 16px 5px; text-align: center; color: #ffd9a3; font-size: 12px; }
+.countdown:fullscreen { box-sizing: border-box; display: grid; place-items: center; min-height: 100vh; overflow: hidden; background: radial-gradient(ellipse at center, #315c70 0%, #173d56 48%, #0b2c43 82%); }
+.countdown:fullscreen::before { content: ''; position: absolute; inset: 0; pointer-events: none; background: url('/assets/event-title-2026.png') center / min(72vw, 900px) auto no-repeat; opacity: .24; mix-blend-mode: multiply; }
+.countdown:fullscreen .countdown-inner { width: min(1320px, calc(100% - 64px)); min-height: 100vh; box-sizing: border-box; grid-template-columns: 1fr; grid-template-rows: auto 1fr auto; justify-items: center; gap: clamp(24px, 5vh, 55px); padding-block: clamp(30px, 7vh, 80px); }
+.countdown:fullscreen .countdown-inner > * { position: relative; z-index: 1; }
+.countdown:fullscreen .countdown-label { text-align: center; }
+.countdown:fullscreen .countdown-label strong { font-size: clamp(20px, 2.6vw, 32px); }
+.countdown:fullscreen .countdown-label span { font-size: 14px; }
+.countdown:fullscreen .countdown-values { width: min(100%, 1120px); align-self: center; gap: clamp(12px, 3vw, 42px); }
+.countdown:fullscreen .flip-value { font-size: clamp(58px, 12vw, 150px); }
+.countdown:fullscreen .countdown-unit { margin-top: 15px; font-size: clamp(15px, 2vw, 22px); }
+.countdown:fullscreen .countdown-actions { justify-self: center; gap: 26px; }
+.countdown:fullscreen .countdown-venue { font-size: 15px; }
+.countdown:fullscreen .countdown-fullscreen { min-height: 46px; padding-inline: 16px; font-size: 13px; }
 
 .content-section { padding-block: clamp(66px,8vw,115px); }
 .section-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 26px; margin-bottom: 34px; }
@@ -300,7 +315,12 @@ button:disabled { cursor: default; }
 .experience-icon, .speaker-icon { display: grid; place-items: center; background: var(--orange); color: var(--ink); border-radius: 50%; width: 47px; height: 47px; }
 .experience-card h3 { font-size: 22px; font-weight: 800; letter-spacing: -.035em; margin: 17px 0 6px; }
 .experience-card p { font-size: 14px; line-height: 1.65; color: var(--muted); }
-.track-section { background: #f8fafc; }
+.track-section {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: linear-gradient(118deg, #eaf5f8 0%, #f8fafc 43%, #fff5e0 100%);
+}
 .tracks-layout { display: grid; grid-template-columns: minmax(220px,.77fr) 1.5fr; border: 1px solid var(--line); border-radius: 13px; overflow: hidden; background: var(--ivory); box-shadow: 0 16px 45px #0b2c4310; }
 .track-tablist { display: flex; flex-direction: column; border-right: 1px solid var(--line); }
 .track-tablist button { display: flex; flex: 1; align-items: center; gap: 12px; min-height: 55px; padding: 11px 18px; text-align: left; font-size: 14px; font-weight: 800; border-bottom: 1px solid var(--line); transition: background .2s, padding-left .24s var(--ease); }
@@ -527,13 +547,27 @@ button:disabled { cursor: default; }
 @keyframes cloud-particle { to { transform: translate3d(10px, -14px, 0); opacity: .17; } }
 
 .track-network { position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
-.track-network::before { content: ''; position: absolute; inset: -15%; background: radial-gradient(ellipse at 15% 70%, #87ceeb40, transparent 48%), radial-gradient(ellipse at 85% 20%, #ff990015, transparent 42%); animation: network-drift 19s ease-in-out infinite alternate; }
+.track-network::before {
+  content: '';
+  position: absolute;
+  inset: -15%;
+  background:
+    linear-gradient(#0b2c4309 1px, transparent 1px),
+    linear-gradient(90deg, #0b2c4309 1px, transparent 1px),
+    radial-gradient(ellipse at 15% 70%, #87ceeb63, transparent 48%),
+    radial-gradient(ellipse at 85% 20%, #ff990028, transparent 42%);
+  background-size: 42px 42px, 42px 42px, auto, auto;
+  animation: network-drift 19s ease-in-out infinite alternate;
+}
 .track-network svg { width: 100%; height: 100%; position: absolute; inset: 0; }
-.track-network path { fill: none; stroke: #4384a6; stroke-width: 1; opacity: .20; }
-.track-network circle { fill: #559ab9; opacity: .35; animation: network-node 7s ease-in-out infinite alternate; }
+.track-network path { fill: none; stroke: #4384a6; stroke-width: 1.2; opacity: .27; }
+.track-network circle { fill: #559ab9; opacity: .48; filter: drop-shadow(0 0 4px #559ab966); animation: network-node 7s ease-in-out infinite alternate; }
 .track-network circle:nth-of-type(3n) { fill: #ff9900; }
 @keyframes network-drift { to { transform: translate3d(4%, -3%, 0); } }
 @keyframes network-node { to { opacity: .13; } }
+@media (prefers-reduced-motion: reduce) {
+  .track-network::before, .track-network circle { animation: none; }
+}
 
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   .track-tablist button { position: relative; transition: transform .4s var(--ease), box-shadow .4s, background-color .4s; }

@@ -1,7 +1,7 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { AnimatePresence, motion, useReducedMotion, MotionConfig, useScroll, useSpring, useTransform } from 'motion/react';
-import { ArrowLeft, ArrowRight, ArrowUp, ArrowUpRight, CalendarDays, ChevronDown, Cloud, Code2, Cpu, MapPin, Menu, Mic, Radio, Shield, Sparkles, Users, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ArrowUp, ArrowUpRight, CalendarDays, ChevronDown, Cloud, Code2, Cpu, MapPin, Maximize, Menu, Mic, Minimize, Radio, Shield, Sparkles, Users, X } from 'lucide-react';
 import { photos, sessions, tracks } from './event-data';
 import { CloudBackdrop, resetTrackTilt, ScrollKite, tiltTrack, TrackAnimation, TrackNetwork } from './event-motion';
 import './styles.css';
@@ -96,11 +96,7 @@ const tileOrder = [
 function EventTitle({ enabled }) {
   const [assembling, setAssembling] = useState(false);
   useLayoutEffect(() => {
-    if (!enabled || (location.hash && location.hash !== '#top') || window.scrollY > 40) return;
-    try {
-      if (sessionStorage.getItem('scd-title-assembly')) return;
-      sessionStorage.setItem('scd-title-assembly', '1');
-    } catch { /* Play normally when storage is unavailable. */ }
+    if (!enabled) return;
     setAssembling(true);
     const timer = setTimeout(() => setAssembling(false), 1200);
     return () => clearTimeout(timer);
@@ -162,7 +158,25 @@ function secondsToEvent() {
 }
 
 function Countdown({ enabled }) {
+  const section = useRef(null);
+  const [fullscreen, setFullscreen] = useState(false);
+  const [fullscreenError, setFullscreenError] = useState('');
   const [remaining, setRemaining] = useState(secondsToEvent);
+  useEffect(() => {
+    function syncFullscreen() {
+      setFullscreen(document.fullscreenElement === section.current);
+      setFullscreenError('');
+    }
+    function reportFullscreenError() {
+      setFullscreenError('Fullscreen could not be opened. Check your browser permissions and try again.');
+    }
+    document.addEventListener('fullscreenchange', syncFullscreen);
+    document.addEventListener('fullscreenerror', reportFullscreenError);
+    return () => {
+      document.removeEventListener('fullscreenchange', syncFullscreen);
+      document.removeEventListener('fullscreenerror', reportFullscreenError);
+    };
+  }, []);
   useEffect(() => {
     let timer;
     const tick = () => {
@@ -176,10 +190,25 @@ function Countdown({ enabled }) {
     tick();
     return () => clearTimeout(timer);
   }, []);
+  async function toggleFullscreen() {
+    setFullscreenError('');
+    try {
+      if (document.fullscreenElement === section.current) {
+        await document.exitFullscreen();
+      } else if (section.current?.requestFullscreen) {
+        await section.current.requestFullscreen();
+      } else {
+        setFullscreenError('Fullscreen is not supported by this browser.');
+      }
+    } catch {
+      setFullscreenError('Fullscreen could not be opened. Check your browser permissions and try again.');
+    }
+  }
   const values = [['Days',Math.floor(remaining/86400)],['Hours',Math.floor(remaining/3600)%24],['Minutes',Math.floor(remaining/60)%60],['Seconds',remaining%60]];
-  return <section className="countdown" aria-label="Countdown to AWS Student Community Day">
+  const FullscreenIcon = fullscreen ? Minimize : Maximize;
+  return <section ref={section} className="countdown" aria-label="Countdown to AWS Student Community Day">
     <div className="site-wrap countdown-inner">
-      <div className="countdown-label flex items-center gap-3"><Sparkles aria-hidden="true"/><div><strong>Countdown to Community Day</strong><span>12 December · 08:00 AM IST</span></div></div>
+      <div className="countdown-label"><div><strong>AWS Student Community Day</strong><span>Ahmedabad 2026 · 12 December · 08:00 AM IST</span></div></div>
       <div className="countdown-values" role="timer" aria-live="off">
         {values.map(([label, value]) => {
           const digits = String(value).padStart(2, '0');
@@ -191,8 +220,15 @@ function Countdown({ enabled }) {
           </div>;
         })}
       </div>
-      <a href="#venue" className="countdown-venue">Meet us at Silver Oak <ArrowUpRight size={17}/></a>
+      <div className="countdown-actions">
+        <a href="#venue" className="countdown-venue">Meet us at Silver Oak <ArrowUpRight size={17}/></a>
+        <button type="button" className="countdown-fullscreen" onClick={toggleFullscreen} aria-label={fullscreen ? 'Exit fullscreen countdown' : 'Show countdown fullscreen'} title={fullscreen ? 'Exit fullscreen' : 'Show countdown fullscreen'}>
+          <FullscreenIcon size={18} aria-hidden="true"/>
+          <span>{fullscreen ? 'Exit fullscreen' : 'Fullscreen'}</span>
+        </button>
+      </div>
     </div>
+    <p className="countdown-error" role="status" aria-live="polite">{fullscreenError}</p>
   </section>;
 }
 
@@ -239,10 +275,6 @@ function Hero({enabled, saveDate}) {
           <Reveal enabled={enabled} hero delay={.31} className="hero-actions flex flex-wrap items-center gap-3">
             <a className="cta" href="#the-day">Explore the day <ArrowRight size={17}/></a>
             <button className="cta secondary" type="button" onClick={saveDate}><CalendarDays size={17}/> Save the date</button>
-          </Reveal>
-          <Reveal enabled={enabled} hero delay={.38} className="hero-date">
-            <span className="hero-date-tile" aria-hidden="true">12<small>DEC</small></span>
-            <div><strong>Saturday, 12 December 2026</strong><span>08:00 AM–05:30 PM IST · In person</span></div>
           </Reveal>
         </motion.div>
         <a className="scroll-cue" href="#the-day">Scroll to discover <ChevronDown size={16}/></a>
