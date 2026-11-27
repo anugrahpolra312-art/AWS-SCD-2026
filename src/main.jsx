@@ -1,9 +1,14 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { AnimatePresence, motion, useReducedMotion, MotionConfig, useScroll, useSpring, useTransform } from 'motion/react';
+<<<<<<< HEAD
 import { ArrowLeft, ArrowRight, ArrowUp, ArrowUpRight, CalendarDays, ChevronDown, Cloud, Code2, Cpu, MapPin, Maximize, Menu, Mic, Minimize, Radio, Shield, Sparkles, Users, X } from 'lucide-react';
+=======
+import { ArrowLeft, ArrowRight, ArrowUp, ArrowUpRight, CalendarDays, ChevronDown, Cloud, Code2, Cpu, Mail, MapPin, Menu, Mic, Phone, Radio, Shield, Sparkles, Users, X } from 'lucide-react';
+>>>>>>> cbd7e4b (footer add-on and bot is added)
 import { photos, sessions, tracks } from './event-data';
 import { CloudBackdrop, resetTrackTilt, ScrollKite, tiltTrack, TrackAnimation, TrackNetwork } from './event-motion';
+import { ScdBot } from './ScdBot';
 import './styles.css';
 
 const navigation = [['the-day','The day'],['tracks','Tracks'],['lineup','Schedule'],['glimpses','Glimpses'],['venue','Venue']];
@@ -69,14 +74,14 @@ function Header({ enabled }) {
       <nav className="desktop-navigation" aria-label="Main navigation">
         {navigation.map(([id,label]) => <a key={id} href={'/#'+id} aria-current={active === id ? 'location' : undefined}>{label}</a>)}
       </nav>
-      <a className="cta small desktop-save" href={registrationUrl} target="_blank" rel="noreferrer">Register <ArrowUpRight size={16}/></a>
+      <a className="cta small desktop-save" href={registrationUrl} target="_blank" rel="noreferrer">Get Ticket <ArrowUpRight size={16}/></a>
       <button type="button" ref={button} className="menu-button scene-button" aria-label={menu ? 'Close navigation' : 'Open navigation'} aria-expanded={menu} aria-controls="mobile-navigation" onClick={() => setMenu(!menu)}>{menu ? <X /> : <Menu />}</button>
     </div>
     <AnimatePresence initial={false}>
       {menu && <motion.nav id="mobile-navigation" className="mobile-navigation" aria-label="Mobile navigation"
         initial={enabled ? {opacity:0,y:-12} : false} animate={{opacity:1,y:0}} exit={{opacity:0,y:-8}} transition={{duration:enabled?.2:0}}>
         {navigation.map(([id,label]) => <a key={id} href={'/#'+id} onClick={() => setMenu(false)} aria-current={active === id ? 'location' : undefined}>{label}<ArrowRight size={17}/></a>)}
-        <a className="cta registration-link" href={registrationUrl} target="_blank" rel="noreferrer" onClick={() => setMenu(false)}>Register <ArrowUpRight size={17}/></a>
+        <a className="cta registration-link" href={registrationUrl} target="_blank" rel="noreferrer" onClick={() => setMenu(false)}>Get Ticket <ArrowUpRight size={17}/></a>
       </motion.nav>}
     </AnimatePresence>
     <motion.div className="reading-progress" style={{ scaleX: enabled ? progress : scrollYProgress }} aria-hidden="true" />
@@ -484,7 +489,7 @@ function Venue({enabled,saveDate}) {
   const questions=[
     ['When and where is the event?','Saturday, 12 December 2026, from 08:00 AM to 05:30 PM IST at Aryabhata Auditorium, 5th floor, EB-Block, Silver Oak University, Ahmedabad.'],
     ['Is the schedule available?','Yes. The schedule section has all ten activities and their timings.'],
-    ['How can I register?','Registrations are open on KonfHub. Select Register in the navigation to open the registration page.'],
+    ['How can I register?','Registrations are open on KonfHub. Select Get Ticket in the navigation to open the registration page.'],
     ['What topics will be covered?','Explore Behind AWS Scenes, DevSecOps, Quantum, AI Agents, Robotics, and IoT TwinMaker in the technical tracks section.']
   ];
   return <>
@@ -544,8 +549,77 @@ function App() {
         <Gallery enabled={enabled}/>
         <Venue enabled={enabled} saveDate={saveDate}/>
       </main>
-      <footer className="site-footer"><div className="site-wrap footer-inner flex flex-wrap items-center justify-between gap-6"><div><strong>AWS Student Community Day Ahmedabad 2026</strong><span>AWS Student Builder Group at Silver Oak University</span></div><a href="#top" className="back-top">Back to top <ArrowUp size={17}/></a></div></footer>
+      <footer className="site-footer" id="contact">
+        <div className="site-wrap footer-shell">
+          <div className="footer-grid">
+            <div className="footer-brand-col">
+              <a className="footer-brand" href="/#top" aria-label="AWS Student Community Day Ahmedabad 2026 home">
+                <img className="university-logo" src={asset('silver-oak-logo.png')} alt="Silver Oak University" />
+                <span className="brand-divider" />
+                <img className="builder-logo" src={asset('aws-builder-logo-2026.png')} alt="AWS Student Builder Group at Silver Oak University" />
+              </a>
+              <address className="footer-address">
+                352/353, Silver Oak University, 370/371, near Bhavik Publication, Gota, Ahmedabad, Gujarat 382481
+              </address>
+            </div>
+
+            <div className="footer-links-col">
+              <h3 className="footer-heading">Quick Links</h3>
+              <ul className="footer-links">
+                {navigation.map(([id, label]) => (
+                  <li key={id}><a href={'/#' + id}>{label}</a></li>
+                ))}
+                <li><a href={registrationUrl} target="_blank" rel="noreferrer">Get Ticket <ArrowUpRight size={14} /></a></li>
+              </ul>
+            </div>
+
+            <div className="footer-contact-col">
+              <h3 className="footer-heading">Contact Team</h3>
+              <div className="footer-contact-card">
+                <div className="footer-contact-item">
+                  <strong>Rishi Amrutiya</strong>
+                  <a href="tel:+916352474784"><Phone size={15} aria-hidden="true" /> +91 63524 74784</a>
+                </div>
+                <div className="footer-contact-divider" aria-hidden="true" />
+                <div className="footer-contact-item">
+                  <strong>Prince Sabalpara</strong>
+                  <a href="tel:+918780197250"><Phone size={15} aria-hidden="true" /> +91 87801 97250</a>
+                </div>
+              </div>
+              <a className="footer-email-card" href="mailto:awssbg@silveroakuni.ac.in">
+                <Mail size={16} aria-hidden="true" />
+                <span>awssbg@silveroakuni.ac.in</span>
+              </a>
+            </div>
+
+            <div className="footer-social-col">
+              <h3 className="footer-heading">Follow Us</h3>
+              <div className="footer-socials" aria-label="Social media">
+                <a href="https://www.linkedin.com" target="_blank" rel="noreferrer" aria-label="LinkedIn">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
+                </a>
+                <a href="https://www.instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+                </a>
+                <a href="https://x.com" target="_blank" rel="noreferrer" aria-label="X">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </a>
+              </div>
+              <p className="footer-social-copy">Stay connected with us on social media for the latest updates, events, and cloud computing insights!</p>
+            </div>
+          </div>
+
+          <div className="footer-bottom">
+            <div className="footer-legal">
+              <span>© 2026 AWS Student Community Day Ahmedabad. All rights reserved.</span>
+              <em>Organized by AWS Student Builder Group · Silver Oak University</em>
+            </div>
+            <a href="#top" className="back-top">Back to top <ArrowUp size={17}/></a>
+          </div>
+        </div>
+      </footer>
       <div className="toast-holder" role="status" aria-live="polite"><AnimatePresence>{toast&&<motion.div className="toast" initial={enabled?{opacity:0,y:10}:false} animate={{opacity:1,y:0}} exit={{opacity:0}} transition={{duration:enabled?.2:0}}>Calendar file downloaded</motion.div>}</AnimatePresence></div>
+      <ScdBot enabled={enabled}/>
     </div>
   </MotionConfig>;
 }
