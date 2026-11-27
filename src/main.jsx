@@ -1,11 +1,7 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { AnimatePresence, motion, useReducedMotion, MotionConfig, useScroll, useSpring, useTransform } from 'motion/react';
-<<<<<<< HEAD
-import { ArrowLeft, ArrowRight, ArrowUp, ArrowUpRight, CalendarDays, ChevronDown, Cloud, Code2, Cpu, MapPin, Maximize, Menu, Mic, Minimize, Radio, Shield, Sparkles, Users, X } from 'lucide-react';
-=======
-import { ArrowLeft, ArrowRight, ArrowUp, ArrowUpRight, CalendarDays, ChevronDown, Cloud, Code2, Cpu, Mail, MapPin, Menu, Mic, Phone, Radio, Shield, Sparkles, Users, X } from 'lucide-react';
->>>>>>> cbd7e4b (footer add-on and bot is added)
+import { ArrowLeft, ArrowRight, ArrowUp, ArrowUpRight, CalendarDays, ChevronDown, Cloud, Code2, Cpu, Mail, MapPin, Maximize, Menu, Mic, Minimize, Phone, Radio, Shield, Sparkles, Users, X } from 'lucide-react';
 import { photos, sessions, tracks } from './event-data';
 import { CloudBackdrop, resetTrackTilt, ScrollKite, tiltTrack, TrackAnimation, TrackNetwork } from './event-motion';
 import { ScdBot } from './ScdBot';
