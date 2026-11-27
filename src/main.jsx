@@ -406,7 +406,7 @@ function Schedule({enabled}) {
       <TimelineRow title="Afternoon" items={sessions.slice(5)} enabled={enabled}/>
       <p className="schedule-note">All times are in IST. Some afternoon activities overlap.</p>
       <Reveal enabled={enabled} className="speakers flex items-center gap-4">
-        <span className="speaker-icon"><Mic size={25}/></span><div><h3>Speakers revealing soon</h3><p>Check back for the full lineup.</p></div><Sparkles className="speaker-spark" aria-hidden="true"/>
+        <span className="speaker-icon"><Mic size={25}/></span><div><h3>Speakers revealing soon</h3><p>Check back for the full lineup.</p></div>
       </Reveal>
     </div>
   </section>;

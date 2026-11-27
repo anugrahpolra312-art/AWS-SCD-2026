@@ -337,7 +337,10 @@ button:disabled { cursor: default; }
 .track-description { color: var(--muted); max-width: 515px; font-size: 14px; line-height: 1.7; }
 .track-emblem { width: 65px; height: 65px; display: grid; place-items: center; background: #f7941d25; border: 1px solid #ab602c35; border-radius: 16px; color: #9c541c; margin-bottom: 20px; }
 .topic-list { margin-top: 17px; }
-.topic-list span { border: 1px solid var(--line); background: #fff1cfa8; border-radius: 999px; padding: 6px 10px; font-size: 11px; font-weight: 800; }
+.topic-list span { border: 1px solid var(--line); background: #fff1cfa8; border-radius: 999px; padding: 6px 10px; font-size: 11px; font-weight: 800; transition: transform .22s var(--ease), border-color .22s, background-color .22s, box-shadow .22s; }
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .topic-list span:hover { transform: translateY(-2px); border-color: #f7941d99; background: #fff8e7; box-shadow: 0 4px 12px #a9590020; }
+}
 
 .schedule-section { background: radial-gradient(ellipse at 100% 0%,#1c4b65,transparent 55%), var(--ink); color: var(--paper); position: relative; isolation: isolate; }
 .schedule-section::before { content: ''; position: absolute; inset: 0; z-index: -1; background: url('/assets/ahmedabad-lines.svg') right top / min(1400px,140%) auto no-repeat; filter: invert(1); opacity: .12; }
@@ -362,7 +365,6 @@ button:disabled { cursor: default; }
 .speakers h3 { font-size: 20px; font-weight: 800; letter-spacing: -.03em; }
 .speakers p { font-size: 13px; color: #c5d5dd; margin-top: 2px; }
 .speaker-icon { flex: 0 0 47px; }
-.speaker-spark { margin-left: auto; color: var(--orange); }
 
 .gallery-filters { margin-bottom: 20px; }
 .filter { min-height: 42px; border: 1px solid var(--line); border-radius: 999px; padding: 7px 15px; color: var(--ink); background: #fff8e7a8; font-weight: 800; font-size: 12px; transition: background .24s, color .24s; }
